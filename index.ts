@@ -1,6 +1,9 @@
+type ApiError = Error | string | number | unknown;
+type ApiResponse = { status: number };
+
 type Handler<T> = {
   next?: (value: T) => void;
-  error?: (error: any) => void;
+  error?: (error: ApiError) => void;
   complete?: () => void;
 };
 
@@ -20,7 +23,7 @@ class Observer<T> {
     }
   }
 
-  error(error: any): void {
+  error(error: ApiError): void {
     if (!this.isUnsubscribed) {
       if (this.handlers.error) {
         this.handlers.error(error);
@@ -124,12 +127,12 @@ const requestsMock: CustomRequest[] = [
   },
 ];
 
-const handleRequest = (request: CustomRequest): { status: number } => {
+const handleRequest = (request: CustomRequest): ApiResponse => {
   // handling of request
   return { status: HTTP_STATUS_OK };
 };
 
-const handleError = (error: unknown): { status: number } => {
+const handleError = (error: ApiError): ApiResponse => {
   if (error instanceof Error) {
     console.error("Error:", error.message);
   } else {
